@@ -49,26 +49,27 @@ Generate 5 questions in the following JSON format:
   ]
 }
 
-Make sure each question:
-1. Is clearly based on the provided text
-2. Has exactly 4 options
-3. Is focused on important concepts
-4. Is unambiguous`;
+Requirements:
+1. Generate exactly 5 questions
+2. Each question must have exactly 4 options
+3. Questions must be based only on the provided text
+4. Questions should be clear and unambiguous
+5. Return only valid JSON in the specified format`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that generates multiple choice questions based on PDF content. Return only valid JSON in the specified format."
+          content: "You are a precise quiz generator that creates multiple choice questions based on provided text. Always return valid JSON in the specified format."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      temperature: 0.5,
+      max_tokens: 1500,
       response_format: { type: "json_object" }
     });
 
