@@ -1,216 +1,75 @@
-import { useState } from "react";
-import axios from "axios";
-
-// Import PDF.js in a way that works with Next.js
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
-// Initialize the worker in a way that works with Next.js
-if (typeof window !== 'undefined') {
-  const pdfjsWorker = require('pdfjs-dist/legacy/build/pdf.worker.entry');
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-}
-
-const extractTextFromPdf = async (file) => {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjsLib.getDocument(new Uint8Array(arrayBuffer));
-    const pdf = await loadingTask.promise;
-    
-    let fullText = '';
-    
-    // Get text from all pages
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map(item => item.str)
-        .join(' ');
-      fullText += pageText + ' ';
-    }
-    
-    return fullText.trim();
-  } catch (error) {
-    console.error('Error extracting text from PDF:', error);
-    throw new Error('Failed to extract text from PDF');
-  }
-};
+import { useRouter } from 'next/router';
 
 export default function Home() {
-  const [questions, setQuestions] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [feedback, setFeedback] = useState("");
-  const [showQuiz, setShowQuiz] = useState(false);
-  const [quizComplete, setQuizComplete] = useState(false);
-  const [validationPdfUploaded, setValidationPdfUploaded] = useState(false);
-  const [validationPdfText, setValidationPdfText] = useState("");
-
-  const handleQuizPdfUpload = async (file) => {
-    try {
-      setFeedback("Processing PDF...");
-      const text = await extractTextFromPdf(file);
-      
-      if (!text) {
-        throw new Error('No text was extracted from the PDF');
-      }
-
-      console.log('Sending PDF content to API...');
-      const response = await axios.post('/api/generate-questions', {
-        pdfContent: text
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity
-      });
-      
-      if (!response.data || !response.data.questions) {
-        throw new Error('Invalid response from server');
-      }
-
-      setQuestions(response.data.questions);
-      setShowQuiz(true);
-      setValidationPdfUploaded(false);
-      setFeedback("");
-    } catch (error) {
-      console.error('Error details:', error);
-      setFeedback(`Error: ${error.message || 'Failed to process PDF'}`);
-      if (error.response) {
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-      }
-    }
-  };
-
-  const handleValidationPdfUpload = async (file) => {
-    try {
-      setFeedback("Processing validation PDF...");
-      const text = await extractTextFromPdf(file);
-      
-      if (!text) {
-        throw new Error('No text was extracted from the validation PDF');
-      }
-
-      setValidationPdfText(text);
-      setValidationPdfUploaded(true);
-      setFeedback("Validation PDF uploaded successfully!");
-    } catch (error) {
-      console.error('Error processing validation PDF:', error);
-      setFeedback(`Error: ${error.message || 'Failed to process validation PDF'}`);
-    }
-  };
-
-  const handleAnswerSelection = async (answer) => {
-    if (!questions[currentQuestionIndex]) return;
-    
-    if (!validationPdfUploaded) {
-      alert('Please upload the validation PDF first!');
-      return;
-    }
-
-    setSelectedAnswer(answer);
-    setFeedback("Checking answer...");
-    
-    const currentQuestion = questions[currentQuestionIndex];
-    
-    try {
-      const response = await axios.post("/api/check-answer", {
-        question: currentQuestion.question,
-        selectedAnswer: answer,
-        options: currentQuestion.options,
-        pdfContent: validationPdfText
-      });
-
-      const { isCorrect, explanation } = response.data;
-
-      if (isCorrect) {
-        setFeedback(`✅ Correct! ${explanation}`);
-        
-        setTimeout(() => {
-          if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-            setSelectedAnswer(null);
-            setFeedback("");
-          } else {
-            setQuizComplete(true);
-          }
-        }, 2000);
-      } else {
-        setFeedback(`❌ Incorrect. ${explanation}`);
-      }
-    } catch (error) {
-      console.error("Error checking answer:", error);
-      setFeedback("❌ Error checking answer. Please try again.");
-    }
-  };
+  const router = useRouter();
 
   return (
-    <div className="container mx-auto p-4">
-      {!showQuiz ? (
-        <div className="text-center">
-          <h1 className="text-2xl mb-4">Upload PDF to Generate Quiz</h1>
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => handleQuizPdfUpload(e.target.files[0])}
-            className="mb-4"
-          />
-        </div>
-      ) : (
-        <div>
-          {!validationPdfUploaded && (
-            <div className="text-center mb-4">
-              <h2 className="text-xl mb-2">Upload Validation PDF</h2>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
-                className="mb-4"
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container mx-auto px-4 py-16">
+        {/* Hero Section */}
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h1 className="text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
+            PDF Quiz Generator
+            <span className="block text-blue-600">Learn Smarter</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Transform any PDF into an interactive quiz. Upload your study material and test your knowledge instantly.
+          </p>
+          <button
+            onClick={() => router.push('/quiz')}
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            Start Quiz
+            <svg
+              className="w-5 h-5 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
               />
-            </div>
-          )}
-          
-          {!quizComplete ? (
-            <div>
-              <h2 className="text-xl mb-4">
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </h2>
-              <p className="mb-4">{questions[currentQuestionIndex]?.question}</p>
-              <div className="space-y-2">
-                {questions[currentQuestionIndex]?.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswerSelection(option)}
-                    className={`w-full p-2 text-left rounded ${
-                      selectedAnswer === option
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-              {feedback && (
-                <div className="mt-4 p-2 rounded bg-gray-100">
-                  {feedback}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center">
-              <h2 className="text-2xl">Quiz Complete!</h2>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Start New Quiz
-              </button>
-            </div>
-          )}
+            </svg>
+          </button>
         </div>
-      )}
+
+        {/* Features Section */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <div className="text-blue-600 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Upload PDF</h3>
+            <p className="text-gray-600">Simply upload your PDF study material to get started.</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <div className="text-blue-600 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Generate Questions</h3>
+            <p className="text-gray-600">AI automatically creates relevant quiz questions.</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+            <div className="text-blue-600 mb-4">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Test Knowledge</h3>
+            <p className="text-gray-600">Take the quiz and get instant feedback on your answers.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
