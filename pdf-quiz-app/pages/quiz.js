@@ -100,16 +100,6 @@ export default function Quiz() {
 
       if (isCorrect) {
         setFeedback(`✅ Correct! ${explanation}`);
-        
-        setTimeout(() => {
-          if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(currentQuestionIndex + 1);
-            setSelectedAnswer(null);
-            setFeedback("");
-          } else {
-            setQuizComplete(true);
-          }
-        }, 2000);
       } else {
         setFeedback(`❌ Incorrect. ${explanation}`);
       }
@@ -202,7 +192,7 @@ export default function Quiz() {
               </div>
 
               {feedback && (
-                <div className={`p-4 rounded-lg ${
+                <div className={`p-4 rounded-lg mb-4 ${
                   feedback.includes('✅')
                     ? 'bg-green-50 text-green-800'
                     : 'bg-red-50 text-red-800'
@@ -210,6 +200,54 @@ export default function Quiz() {
                   {feedback}
                 </div>
               )}
+
+              <div className="flex justify-between items-center mt-6">
+                <button
+                  onClick={() => {
+                    if (currentQuestionIndex > 0) {
+                      setCurrentQuestionIndex(currentQuestionIndex - 1);
+                      setSelectedAnswer(null);
+                      setFeedback("");
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg flex items-center ${
+                    currentQuestionIndex > 0
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                  disabled={currentQuestionIndex === 0}
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                  Previous
+                </button>
+
+                <span className="text-gray-600">
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </span>
+
+                <button
+                  onClick={() => {
+                    if (currentQuestionIndex < questions.length - 1) {
+                      setCurrentQuestionIndex(currentQuestionIndex + 1);
+                      setSelectedAnswer(null);
+                      setFeedback("");
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg flex items-center ${
+                    currentQuestionIndex < questions.length - 1 && feedback.includes('✅')
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                  disabled={currentQuestionIndex === questions.length - 1 || !feedback.includes('✅')}
+                >
+                  Next
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-lg p-8 text-center">
