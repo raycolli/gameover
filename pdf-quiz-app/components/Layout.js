@@ -1,13 +1,23 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 export default function Layout({ children }) {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <span className="text-xl font-bold text-blue-600">PDF Quiz</span>
-              </div>
+              <Link 
+                href="/dashboard" 
+                className="flex-shrink-0 flex items-center cursor-pointer"
+              >
+                <span className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                  PDF Quiz
+                </span>
+              </Link>
             </div>
           </div>
         </div>

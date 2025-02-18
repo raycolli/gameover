@@ -7,7 +7,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
-        <div className="max-w-4xl mx-auto text-center mb-16">
+        <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
             PDF Quiz Generator
             <span className="block text-blue-600">Learn Smarter</span>
@@ -16,16 +16,15 @@ export default function Home() {
             Transform any PDF into an interactive quiz. Upload your study material and test your knowledge instantly.
           </p>
           <button
-            onClick={() => router.push('/quiz')}
+            onClick={() => router.push('/dashboard')}
             className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
-            Start Quiz
+            Get Started
             <svg
               className="w-5 h-5 ml-2"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
