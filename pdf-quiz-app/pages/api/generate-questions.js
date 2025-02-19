@@ -57,7 +57,7 @@ Requirements:
 5. Return only valid JSON in the specified format`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

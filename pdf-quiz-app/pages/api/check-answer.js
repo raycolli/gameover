@@ -31,7 +31,7 @@ Instructions:
 Respond with ONLY "true" or "false".`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -51,7 +51,7 @@ Respond with ONLY "true" or "false".`;
 
     // Get explanation for both correct and incorrect answers
     const explanationCompletion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
@@ -66,7 +66,7 @@ Explain why this answer is ${isCorrect ? 'correct' : 'incorrect'} using specific
         }
       ],
       temperature: 0.3,
-      max_tokens: 150
+      max_tokens: 120
     });
 
     const explanation = explanationCompletion.choices[0].message.content;
