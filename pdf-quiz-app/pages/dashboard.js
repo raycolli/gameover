@@ -1,14 +1,23 @@
 import { useRouter } from 'next/router';
+import { withAuth } from '../components/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
-export default function Dashboard() {
+function Dashboard() {
   const router = useRouter();
+  const { userProfile, isAdmin } = useAuth();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Welcome to Your Dashboard
+          Welcome, {userProfile.full_name}
         </h1>
+        
+        {isAdmin() && (
+          <div>
+            <h2>Admin Controls</h2>
+          </div>
+        )}
         
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -34,4 +43,6 @@ export default function Dashboard() {
       </div>
     </div>
   );
-} 
+}
+
+export default withAuth(Dashboard, ['user', 'admin']); 
