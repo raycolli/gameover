@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { withAuth } from '../components/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 // Import PDF.js in a way that works with Next.js
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
@@ -35,7 +37,8 @@ const extractTextFromPdf = async (file) => {
   }
 };
 
-export default function Quiz() {
+function Quiz() {
+  const { userProfile } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -269,3 +272,6 @@ export default function Quiz() {
     </div>
   );
 }
+
+// Wrap the Quiz component with withAuth to protect it
+export default withAuth(Quiz, ['user', 'admin']);
