@@ -3,19 +3,62 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #1A1A2E;  /* deep-navy */
+  --foreground: #E0E0E0;  /* cool-gray */
+  --accent: #00C4B4;      /* vibrant-cyan */
+  --accent-hover: #C084FC; /* soft-lilac */
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
 }
+
+@layer components {
+  .btn-primary {
+    @apply bg-vibrant-cyan text-deep-navy px-4 py-2 rounded-lg 
+    hover:bg-soft-lilac transition-all duration-200 shadow-md;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-vibrant-cyan text-vibrant-cyan 
+    px-4 py-2 rounded-lg hover:bg-vibrant-cyan hover:text-deep-navy 
+    transition-all duration-200;
+  }
+
+  .input-field {
+    @apply bg-cool-gray bg-opacity-10 border border-cool-gray border-opacity-20 
+    rounded-lg px-4 py-2 text-cool-gray placeholder-cool-gray placeholder-opacity-50
+    focus:outline-none focus:ring-2 focus:ring-vibrant-cyan focus:border-transparent
+    transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-deep-navy border border-cool-gray border-opacity-10 
+    rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-200;
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-deep-navy;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-vibrant-cyan bg-opacity-50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-soft-lilac bg-opacity-50;
+}
+
+/* Selection color */
+::selection {
+  @apply bg-vibrant-cyan bg-opacity-30 text-cool-gray;
+} 

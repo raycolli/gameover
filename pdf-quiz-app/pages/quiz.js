@@ -115,8 +115,8 @@ function Quiz() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {!showQuiz ? (
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        <div className="bg-deep-navy border border-cool-gray border-opacity-10 rounded-xl shadow-md p-8 text-center">
+          <h1 className="text-3xl font-bold text-cool-gray mb-6">
             Upload PDF to Generate Quiz
           </h1>
           <div className="space-y-4">
@@ -124,57 +124,57 @@ function Quiz() {
               type="file"
               accept=".pdf"
               onChange={(e) => handleFileUpload(e.target.files[0])}
-              className="block w-full text-sm text-gray-500 
+              className="block w-full text-sm text-cool-gray 
                 file:mr-4 file:py-2 file:px-4 
                 file:rounded-full file:border-0 
                 file:text-sm file:font-semibold 
-                file:bg-blue-50 file:text-blue-700 
-                hover:file:bg-blue-100"
+                file:bg-vibrant-cyan file:text-deep-navy 
+                hover:file:bg-soft-lilac"
             />
           </div>
         </div>
       ) : (
         <div className="space-y-8">
           {!validationPdfUploaded && (
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <div className="bg-deep-navy border border-cool-gray border-opacity-10 rounded-xl shadow-md p-8">
+              <h2 className="text-2xl font-bold text-cool-gray mb-4">
                 Upload Validation PDF
               </h2>
               <input
                 type="file"
                 accept=".pdf"
                 onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
-                className="block w-full text-sm text-gray-500 
+                className="block w-full text-sm text-cool-gray 
                   file:mr-4 file:py-2 file:px-4 
                   file:rounded-full file:border-0 
                   file:text-sm file:font-semibold 
-                  file:bg-blue-50 file:text-blue-700 
-                  hover:file:bg-blue-100"
+                  file:bg-vibrant-cyan file:text-deep-navy 
+                  hover:file:bg-soft-lilac"
               />
             </div>
           )}
 
           {!quizComplete ? (
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-deep-navy border border-cool-gray border-opacity-10 rounded-xl shadow-md p-8">
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-cool-gray">
                     Question {currentQuestionIndex + 1} of {questions.length}
                   </h2>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-vibrant-cyan text-deep-navy rounded-full text-sm font-medium">
                     {Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%
                   </span>
                 </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full">
+                <div className="h-2 w-full bg-cool-gray bg-opacity-20 rounded-full">
                   <div
-                    className="h-2 bg-blue-600 rounded-full transition-all duration-300"
+                    className="h-2 bg-vibrant-cyan rounded-full transition-all duration-300"
                     style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                   ></div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <p className="text-lg text-gray-800 mb-4">
+                <p className="text-lg text-cool-gray mb-4">
                   {questions[currentQuestionIndex]?.question}
                 </p>
                 <div className="space-y-3">
@@ -184,8 +184,8 @@ function Quiz() {
                       onClick={() => handleAnswerSelection(option)}
                       className={`w-full p-4 text-left rounded-lg transition-all duration-200 
                         ${selectedAnswer === option
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-50 hover:bg-gray-100 text-gray-800'
+                          ? 'bg-vibrant-cyan text-deep-navy'
+                          : 'bg-cool-gray bg-opacity-10 hover:bg-opacity-20 text-cool-gray'
                         }`}
                     >
                       <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {option}
@@ -215,8 +215,8 @@ function Quiz() {
                   }}
                   className={`px-4 py-2 rounded-lg flex items-center ${
                     currentQuestionIndex > 0
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-vibrant-cyan text-deep-navy hover:bg-soft-lilac'
+                      : 'bg-cool-gray bg-opacity-20 text-cool-gray opacity-50 cursor-not-allowed'
                   }`}
                   disabled={currentQuestionIndex === 0}
                 >
@@ -226,7 +226,7 @@ function Quiz() {
                   Previous
                 </button>
 
-                <span className="text-gray-600">
+                <span className="text-cool-gray">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </span>
 
@@ -240,8 +240,8 @@ function Quiz() {
                   }}
                   className={`px-4 py-2 rounded-lg flex items-center ${
                     currentQuestionIndex < questions.length - 1 && feedback.includes('✅')
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'bg-vibrant-cyan text-deep-navy hover:bg-soft-lilac'
+                      : 'bg-cool-gray bg-opacity-20 text-cool-gray opacity-50 cursor-not-allowed'
                   }`}
                   disabled={currentQuestionIndex === questions.length - 1 || !feedback.includes('✅')}
                 >
@@ -253,14 +253,14 @@ function Quiz() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            <div className="bg-deep-navy border border-cool-gray border-opacity-10 rounded-xl shadow-md p-8 text-center">
+              <h2 className="text-3xl font-bold text-cool-gray mb-6">
                 Quiz Complete! 🎉
               </h2>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg 
-                  hover:bg-blue-700 transition-colors duration-200
+                className="px-6 py-3 bg-vibrant-cyan text-deep-navy rounded-lg 
+                  hover:bg-soft-lilac transition-all duration-200
                   font-semibold"
               >
                 Start New Quiz

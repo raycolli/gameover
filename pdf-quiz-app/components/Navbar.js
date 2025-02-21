@@ -16,13 +16,15 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-deep-navy border-b border-cool-gray border-opacity-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-blue-600">Note Nibbler</span>
+              <span className="text-xl font-bold text-vibrant-cyan hover:text-soft-lilac transition-all duration-200">
+                Note Nibbler
+              </span>
             </Link>
 
             {/* Navigation Links */}
@@ -31,9 +33,9 @@ export default function Navbar() {
                 href="/"
                 className={`${
                   router.pathname === '/'
-                    ? 'border-blue-500 text-gray-900'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                    ? 'border-vibrant-cyan text-vibrant-cyan'
+                    : 'border-transparent text-cool-gray hover:text-vibrant-cyan'
+                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200`}
               >
                 Home
               </Link>
@@ -44,9 +46,9 @@ export default function Navbar() {
                     href="/dashboard"
                     className={`${
                       router.pathname === '/dashboard'
-                        ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                        ? 'border-vibrant-cyan text-vibrant-cyan'
+                        : 'border-transparent text-cool-gray hover:text-vibrant-cyan'
+                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200`}
                   >
                     Dashboard
                   </Link>
@@ -56,9 +58,9 @@ export default function Navbar() {
                       href="/admin"
                       className={`${
                         router.pathname === '/admin'
-                          ? 'border-blue-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                      } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                          ? 'border-vibrant-cyan text-vibrant-cyan'
+                          : 'border-transparent text-cool-gray hover:text-vibrant-cyan'
+                      } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200`}
                     >
                       Admin
                     </Link>
@@ -72,12 +74,14 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700">
+                <span className="text-cool-gray">
                   {userProfile?.full_name || user.email}
                 </span>
                 <button
                   onClick={handleSignOut}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium 
+                    rounded-lg text-deep-navy bg-vibrant-cyan hover:bg-soft-lilac 
+                    transition-all duration-200 shadow-md"
                 >
                   Sign Out
                 </button>
@@ -86,13 +90,15 @@ export default function Navbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/login"
-                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-cool-gray hover:text-vibrant-cyan transition-all duration-200"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 border border-transparent 
+                    text-sm font-medium rounded-lg text-deep-navy bg-vibrant-cyan 
+                    hover:bg-soft-lilac transition-all duration-200 shadow-md"
                 >
                   Sign Up
                 </Link>
@@ -104,12 +110,14 @@ export default function Navbar() {
           <div className="flex items-center sm:hidden">
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-cool-gray 
+                hover:text-vibrant-cyan hover:bg-cool-gray hover:bg-opacity-10 
+                focus:outline-none focus:ring-2 focus:ring-inset focus:ring-vibrant-cyan
+                transition-all duration-200"
               aria-controls="mobile-menu"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
-              {/* Icon when menu is closed */}
               <svg
                 className="block h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,9 +145,9 @@ export default function Navbar() {
             href="/"
             className={`${
               router.pathname === '/'
-                ? 'bg-blue-50 border-blue-500 text-blue-700'
-                : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                ? 'bg-vibrant-cyan bg-opacity-10 border-vibrant-cyan text-vibrant-cyan'
+                : 'border-transparent text-cool-gray hover:bg-cool-gray hover:bg-opacity-10 hover:text-vibrant-cyan'
+            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-200`}
           >
             Home
           </Link>
@@ -150,9 +158,9 @@ export default function Navbar() {
                 href="/dashboard"
                 className={`${
                   router.pathname === '/dashboard'
-                    ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                    ? 'bg-vibrant-cyan bg-opacity-10 border-vibrant-cyan text-vibrant-cyan'
+                    : 'border-transparent text-cool-gray hover:bg-cool-gray hover:bg-opacity-10 hover:text-vibrant-cyan'
+                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-200`}
               >
                 Dashboard
               </Link>
@@ -162,9 +170,9 @@ export default function Navbar() {
                   href="/admin"
                   className={`${
                     router.pathname === '/admin'
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                  } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                      ? 'bg-vibrant-cyan bg-opacity-10 border-vibrant-cyan text-vibrant-cyan'
+                      : 'border-transparent text-cool-gray hover:bg-cool-gray hover:bg-opacity-10 hover:text-vibrant-cyan'
+                  } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-200`}
                 >
                   Admin
                 </Link>
