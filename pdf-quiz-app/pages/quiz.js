@@ -49,6 +49,7 @@ function Quiz() {
   const [validationPdfText, setValidationPdfText] = useState("");
   const [pdfText, setPdfText] = useState("");
 
+  // Handler functions remain the same
   const handleFileUpload = async (file) => {
     try {
       const text = await extractTextFromPdf(file);
@@ -113,10 +114,10 @@ function Quiz() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl bg-gray-900 text-white">
       {!showQuiz ? (
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        <div className="bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+          <h1 className="text-3xl font-bold text-blue-400 mb-6">
             Upload PDF to Generate Quiz
           </h1>
           <div className="space-y-4">
@@ -124,57 +125,57 @@ function Quiz() {
               type="file"
               accept=".pdf"
               onChange={(e) => handleFileUpload(e.target.files[0])}
-              className="block w-full text-sm text-gray-500 
+              className="block w-full text-sm text-gray-300 
                 file:mr-4 file:py-2 file:px-4 
                 file:rounded-full file:border-0 
                 file:text-sm file:font-semibold 
-                file:bg-blue-50 file:text-blue-700 
-                hover:file:bg-blue-100"
+                file:bg-gray-700 file:text-white 
+                hover:file:bg-gray-600"
             />
           </div>
         </div>
       ) : (
         <div className="space-y-8">
           {!validationPdfUploaded && (
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <div className="bg-gray-800 rounded-xl shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-blue-400 mb-4">
                 Upload Validation PDF
               </h2>
               <input
                 type="file"
                 accept=".pdf"
                 onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
-                className="block w-full text-sm text-gray-500 
+                className="block w-full text-sm text-gray-300 
                   file:mr-4 file:py-2 file:px-4 
                   file:rounded-full file:border-0 
                   file:text-sm file:font-semibold 
-                  file:bg-blue-50 file:text-blue-700 
-                  hover:file:bg-blue-100"
+                  file:bg-gray-700 file:text-white 
+                  hover:file:bg-gray-600"
               />
             </div>
           )}
 
           {!quizComplete ? (
-            <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="bg-gray-800 rounded-xl shadow-lg p-8">
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-blue-400">
                     Question {currentQuestionIndex + 1} of {questions.length}
                   </h2>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <span className="px-3 py-1 bg-gray-700 text-blue-400 rounded-full text-sm font-medium">
                     {Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%
                   </span>
                 </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full">
+                <div className="h-2 w-full bg-gray-700 rounded-full">
                   <div
-                    className="h-2 bg-blue-600 rounded-full transition-all duration-300"
+                    className="h-2 bg-blue-400 rounded-full transition-all duration-300"
                     style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                   ></div>
                 </div>
               </div>
 
               <div className="mb-6">
-                <p className="text-lg text-gray-800 mb-4">
+                <p className="text-lg text-gray-300 mb-4">
                   {questions[currentQuestionIndex]?.question}
                 </p>
                 <div className="space-y-3">
@@ -185,7 +186,7 @@ function Quiz() {
                       className={`w-full p-4 text-left rounded-lg transition-all duration-200 
                         ${selectedAnswer === option
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-50 hover:bg-gray-100 text-gray-800'
+                          : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                         }`}
                     >
                       <span className="font-medium">{String.fromCharCode(65 + index)}.</span> {option}
@@ -197,8 +198,8 @@ function Quiz() {
               {feedback && (
                 <div className={`p-4 rounded-lg mb-4 ${
                   feedback.includes('✅')
-                    ? 'bg-green-50 text-green-800'
-                    : 'bg-red-50 text-red-800'
+                    ? 'bg-green-900 text-white'
+                    : 'bg-blue-600 text-white'
                 }`}>
                   {feedback}
                 </div>
@@ -216,7 +217,7 @@ function Quiz() {
                   className={`px-4 py-2 rounded-lg flex items-center ${
                     currentQuestionIndex > 0
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={currentQuestionIndex === 0}
                 >
@@ -226,7 +227,7 @@ function Quiz() {
                   Previous
                 </button>
 
-                <span className="text-gray-600">
+                <span className="text-gray-300">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </span>
 
@@ -241,7 +242,7 @@ function Quiz() {
                   className={`px-4 py-2 rounded-lg flex items-center ${
                     currentQuestionIndex < questions.length - 1 && feedback.includes('✅')
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={currentQuestionIndex === questions.length - 1 || !feedback.includes('✅')}
                 >
@@ -253,8 +254,8 @@ function Quiz() {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">
+            <div className="bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+              <h2 className="text-3xl font-bold text-blue-400 mb-6">
                 Quiz Complete! 🎉
               </h2>
               <button
