@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,7 +20,7 @@ function Dashboard() {
           </div>
         )}
         
-        <div className="max-w-md mx-auto">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div className="bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
             <div className="text-blue-400 mb-4">
               <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,6 +39,18 @@ function Dashboard() {
             >
               Start Quiz
             </button>
+          </div>
+
+          <div className="bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <Link href="/set-task" className="block">
+              <div className="text-blue-400 mb-4">
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">Set Your Task</h2>
+              <p className="text-gray-300">Create a new focused work session</p>
+            </Link>
           </div>
         </div>
       </div>
