@@ -18,6 +18,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-16">
         {/* Navigation */}
+        { /* 
         <nav className="flex justify-end mb-8">
           {user ? (
             <button
@@ -37,6 +38,7 @@ export default function Home() {
             </div>
           )}
         </nav>
+        */}
 
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center">
