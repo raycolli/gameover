@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../utils/supabaseClient';
+import { useRouter } from 'next/router';
 
 // Import PDF.js in a way that works with Next.js
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
@@ -48,6 +50,10 @@ function Quiz() {
   const [validationPdfUploaded, setValidationPdfUploaded] = useState(false);
   const [validationPdfText, setValidationPdfText] = useState("");
   const [pdfText, setPdfText] = useState("");
+  const [notes, setNotes] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteBody, setNoteBody] = useState("");
+  const router = useRouter();
 
   // Handler functions remain the same
   const handleFileUpload = async (file) => {
@@ -110,6 +116,32 @@ function Quiz() {
     } catch (error) {
       console.error("Error checking answer:", error);
       setFeedback("❌ Error checking answer. Please try again.");
+    }
+  };
+
+  const handleSaveNote = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quiz_notes')
+        .insert([
+          {
+            title: noteTitle,
+            body: noteBody,
+            user_id: userProfile.id
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Clear the form
+      setNoteTitle('');
+      setNoteBody('');
+
+      // Redirect to the quiz notes page
+      router.push('/quiz-notes');
+    } catch (error) {
+      console.error('Error saving note:', error);
+      alert('Failed to save note');
     }
   };
 
@@ -270,6 +302,30 @@ function Quiz() {
           )}
         </div>
       )}
+
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-blue-400 mb-4">Notes</h2>
+        <input
+          type="text"
+          value={noteTitle}
+          onChange={(e) => setNoteTitle(e.target.value)}
+          className="w-full p-2 mb-4 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Note Title"
+        />
+        <textarea
+          value={noteBody}
+          onChange={(e) => setNoteBody(e.target.value)}
+          rows="5"
+          className="w-full p-4 mb-4 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Write your note here..."
+        />
+        <button
+          onClick={handleSaveNote}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+        >
+          Save Note
+        </button>
+      </div>
     </div>
   );
 }
