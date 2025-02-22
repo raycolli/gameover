@@ -41,6 +41,7 @@ export default function Navbar() {
                 </Link>
               )}
 
+              {/* Show these links only when user is logged in */}
               {user && (
                 <>
                   <Link
@@ -54,6 +55,17 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                   
+                  <Link
+                    href="/quiz-notes"
+                    className={`${
+                      router.pathname === '/quiz-notes'
+                        ? 'border-blue-400 text-white'
+                        : 'border-transparent text-gray-300 hover:border-gray-600 hover:text-gray-100'
+                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                  >
+                    Quiz Notes
+                  </Link>
+
                   {userProfile?.role === 'admin' && (
                     <Link
                       href="/admin"
@@ -144,6 +156,7 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* Show these links only when user is logged in */}
           {user && (
             <>
               <Link
@@ -155,6 +168,17 @@ export default function Navbar() {
                 } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
               >
                 Dashboard
+              </Link>
+
+              <Link
+                href="/quiz-notes"
+                className={`${
+                  router.pathname === '/quiz-notes'
+                    ? 'bg-gray-900 border-blue-400 text-white'
+                    : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-600 hover:text-gray-100'
+                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+              >
+                Quiz Notes
               </Link>
 
               {userProfile?.role === 'admin' && (

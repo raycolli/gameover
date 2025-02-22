@@ -20,7 +20,7 @@ function Dashboard() {
           </div>
         )}
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
             <Link href="/quiz" className="block">
               <div className="text-blue-400 mb-4">
@@ -46,22 +46,6 @@ function Dashboard() {
               </div>
               <h2 className="text-xl font-semibold text-white mb-2">Set Your Task</h2>
               <p className="text-gray-300">Create a new focused work session</p>
-            </Link>
-          </div>
-
-          <div className="bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <Link href="/quiz-notes" className="block">
-              <div className="text-blue-400 mb-4">
-                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-semibold text-white mb-2">
-                Quiz Notes
-              </h2>
-              <p className="text-gray-300 mb-4">
-                View and manage your saved quiz notes
-              </p>
             </Link>
           </div>
         </div>
