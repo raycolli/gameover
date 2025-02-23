@@ -3,7 +3,7 @@ import { supabase } from '../utils/supabaseClient';
 import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
-function Nest() {
+function Burrow() {
   const { userProfile } = useAuth();
   const [notes, setNotes] = useState([]);
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(null);
@@ -18,7 +18,7 @@ function Nest() {
   const fetchNotes = async () => {
     try {
       const { data, error } = await supabase
-        .from('nest')
+        .from('burrow')
         .select('*')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -33,7 +33,7 @@ function Nest() {
   const handleDeleteNote = async (noteId) => {
     try {
       const { error } = await supabase
-        .from('nest')
+        .from('burrow')
         .delete()
         .eq('id', noteId);
 
@@ -58,7 +58,7 @@ function Nest() {
   const handleUpdateNote = async () => {
     try {
       const { error } = await supabase
-        .from('nest')
+        .from('burrow')
         .update({
           title: editTitle,
           body: editBody,
@@ -170,4 +170,4 @@ function Nest() {
   );
 }
 
-export default withAuth(Nest, ['user', 'admin']); 
+export default withAuth(Burrow, ['user', 'admin']); 

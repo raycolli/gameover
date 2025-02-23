@@ -64,7 +64,7 @@ function Quiz() {
   const fetchNotes = async () => {
     try {
       const { data, error } = await supabase
-        .from('nest')
+        .from('burrow')
         .select('*')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -142,7 +142,7 @@ function Quiz() {
   const handleSaveNote = async () => {
     try {
       const { data, error } = await supabase
-        .from('nest')
+        .from('burrow')
         .insert([
           {
             title: noteTitle,
@@ -168,7 +168,7 @@ function Quiz() {
   const handleDeleteNote = async (noteId) => {
     try {
       const { error } = await supabase
-        .from('nest')
+        .from('burrow')
         .delete()
         .eq('id', noteId);
 
