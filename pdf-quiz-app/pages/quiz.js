@@ -343,20 +343,20 @@ function Quiz() {
       )}
 
       <div className="mt-8">
-        <h2 className="text-2xl font-bold text-blue-400 mb-4">Notes</h2>
+        <h2 className="text-2xl font-bold text-blue-400 mb-4">Stash</h2>
         <input
           type="text"
           value={noteTitle}
           onChange={(e) => setNoteTitle(e.target.value)}
           className="w-full p-2 mb-4 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Note Title"
+          placeholder="Note "
         />
         <textarea
           value={noteBody}
           onChange={(e) => setNoteBody(e.target.value)}
-          rows="3"
+          rows="6"
           className="w-full p-4 mb-4 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Write your note here..."
+          placeholder="Nibble away at your thoughts…"
         />
         <button
           onClick={handleSaveNote}

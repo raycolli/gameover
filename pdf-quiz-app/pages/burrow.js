@@ -84,7 +84,7 @@ function Burrow() {
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-900 min-h-screen text-white">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">Nest </h1>
+        <h1 className="text-3xl font-bold text-white mb-8">Burrow</h1>
         
         <div className="grid gap-4">
           {notes.map((note, index) => (
