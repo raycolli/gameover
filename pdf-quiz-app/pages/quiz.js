@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
@@ -50,12 +50,32 @@ function Quiz() {
   const [validationPdfUploaded, setValidationPdfUploaded] = useState(false);
   const [validationPdfText, setValidationPdfText] = useState("");
   const [pdfText, setPdfText] = useState("");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState([]);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
+  const [expandedNoteIndex, setExpandedNoteIndex] = useState(null);
   const router = useRouter();
 
   // Handler functions remain the same
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quiz_notes')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setNotes(data);
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+    }
+  };
+
   const handleFileUpload = async (file) => {
     try {
       const text = await extractTextFromPdf(file);
@@ -136,13 +156,32 @@ function Quiz() {
       // Clear the form
       setNoteTitle('');
       setNoteBody('');
-
-      // Redirect to the quiz notes page
-      router.push('/quiz-notes');
+      
+      // Refresh the notes list
+      fetchNotes();
     } catch (error) {
       console.error('Error saving note:', error);
       alert('Failed to save note');
     }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      const { error } = await supabase
+        .from('quiz_notes')
+        .delete()
+        .eq('id', noteId);
+
+      if (error) throw error;
+      fetchNotes();
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Failed to delete note');
+    }
+  };
+
+  const toggleNoteExpansion = (index) => {
+    setExpandedNoteIndex(expandedNoteIndex === index ? null : index);
   };
 
   return (
@@ -315,7 +354,7 @@ function Quiz() {
         <textarea
           value={noteBody}
           onChange={(e) => setNoteBody(e.target.value)}
-          rows="5"
+          rows="3"
           className="w-full p-4 mb-4 bg-gray-800 text-gray-300 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Write your note here..."
         />
@@ -326,6 +365,8 @@ function Quiz() {
           Save Note
         </button>
       </div>
+
+      
     </div>
   );
 }
