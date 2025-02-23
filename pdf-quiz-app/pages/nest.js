@@ -3,7 +3,7 @@ import { supabase } from '../utils/supabaseClient';
 import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 
-function QuizNotes() {
+function Nest() {
   const { userProfile } = useAuth();
   const [notes, setNotes] = useState([]);
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(null);
@@ -18,7 +18,7 @@ function QuizNotes() {
   const fetchNotes = async () => {
     try {
       const { data, error } = await supabase
-        .from('quiz_notes')
+        .from('nest')
         .select('*')
         .eq('user_id', userProfile.id)
         .order('created_at', { ascending: false });
@@ -33,7 +33,7 @@ function QuizNotes() {
   const handleDeleteNote = async (noteId) => {
     try {
       const { error } = await supabase
-        .from('quiz_notes')
+        .from('nest')
         .delete()
         .eq('id', noteId);
 
@@ -58,7 +58,7 @@ function QuizNotes() {
   const handleUpdateNote = async () => {
     try {
       const { error } = await supabase
-        .from('quiz_notes')
+        .from('nest')
         .update({
           title: editTitle,
           body: editBody,
@@ -84,7 +84,7 @@ function QuizNotes() {
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-900 min-h-screen text-white">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">Quiz Notes</h1>
+        <h1 className="text-3xl font-bold text-white mb-8">Nest </h1>
         
         <div className="grid gap-4">
           {notes.map((note, index) => (
@@ -170,4 +170,4 @@ function QuizNotes() {
   );
 }
 
-export default withAuth(QuizNotes, ['user', 'admin']); 
+export default withAuth(Nest, ['user', 'admin']); 

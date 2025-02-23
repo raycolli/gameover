@@ -56,14 +56,14 @@ export default function Navbar() {
                   </Link>
                   
                   <Link
-                    href="/quiz-notes"
+                    href="/nest"
                     className={`${
-                      router.pathname === '/quiz-notes'
+                      router.pathname === '/nest'
                         ? 'border-blue-400 text-white'
                         : 'border-transparent text-gray-300 hover:border-gray-600 hover:text-gray-100'
                     } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                   >
-                    Quiz Notes
+                    Nest
                   </Link>
 
                   {userProfile?.role === 'admin' && (
@@ -171,14 +171,14 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/quiz-notes"
+                href="/nest"
                 className={`${
-                  router.pathname === '/quiz-notes'
+                  router.pathname === '/nest'
                     ? 'bg-gray-900 border-blue-400 text-white'
                     : 'border-transparent text-gray-300 hover:bg-gray-700 hover:border-gray-600 hover:text-gray-100'
                 } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
               >
-                Quiz Notes
+                Nest
               </Link>
 
               {userProfile?.role === 'admin' && (
