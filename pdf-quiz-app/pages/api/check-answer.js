@@ -62,12 +62,12 @@ ${pdfContent}
 Question: "${question}"
 Selected answer: "${selectedAnswer}"
 
-Provide a brief explanation of why this answer is ${isCorrect ? 'correct' : 'incorrect'}.`
+Provide a brief explanation (20-30 words) of why this answer is ${isCorrect ? 'correct' : 'incorrect'}. End with a period.`
         }
       ],
       temperature: 0.3,
-      max_tokens: 48
-    }); // made the responce this short, could be longer
+      max_tokens: 60
+    });
 
     const explanation = explanationCompletion.choices[0].message.content;
 

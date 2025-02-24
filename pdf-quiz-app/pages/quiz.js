@@ -103,7 +103,9 @@ function Quiz() {
   const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(null);
-  const [questionCount, setQuestionCount] = useState(5);
+  const [questionCount, setQuestionCount] = useState(1);
+  const [isFileUploading, setIsFileUploading] = useState(false);
+  const [isValidationFileUploading, setIsValidationFileUploading] = useState(false);
   const router = useRouter();
 
   // Handler functions remain the same
@@ -128,6 +130,7 @@ function Quiz() {
 
   const handleFileUpload = async (file) => {
     try {
+      setIsFileUploading(true);
       const text = await extractTextFromFile(file);
       if (!text) {
         throw new Error('No text could be extracted from the file');
@@ -149,11 +152,14 @@ function Quiz() {
     } catch (error) {
       console.error('Error processing file:', error);
       alert(error.message || 'Error processing file');
+    } finally {
+      setIsFileUploading(false);
     }
   };
 
   const handleValidationPdfUpload = async (file) => {
     try {
+      setIsValidationFileUploading(true);
       const text = await extractTextFromFile(file);
       if (!text) {
         throw new Error('No text could be extracted from the file');
@@ -161,12 +167,13 @@ function Quiz() {
       
       setValidationPdfText(text);
       setValidationPdfUploaded(true);
-      alert('Validation file uploaded successfully!');
     } catch (error) {
       console.error('Error processing validation file:', error);
       alert(error.message || 'Error uploading validation file');
       setValidationPdfUploaded(false);
       setValidationPdfText('');
+    } finally {
+      setIsValidationFileUploading(false);
     }
   };
 
@@ -282,17 +289,26 @@ function Quiz() {
                 className="w-full p-2 bg-gray-700 text-white rounded-lg"
               />
             </div>
-            <input
-              type="file"
-              accept=".pdf,.txt,.doc,.docx"
-              onChange={(e) => handleFileUpload(e.target.files[0])}
-              className="block w-full text-sm text-gray-300 
-                file:mr-4 file:py-2 file:px-4 
-                file:rounded-full file:border-0 
-                file:text-sm file:font-semibold 
-                file:bg-gray-700 file:text-white 
-                hover:file:bg-gray-600"
-            />
+            <div>
+              <input
+                type="file"
+                accept=".pdf,.txt,.doc,.docx"
+                onChange={(e) => handleFileUpload(e.target.files[0])}
+                className={`block w-full text-sm text-gray-300 
+                  file:mr-4 file:py-2 file:px-4 
+                  file:rounded-full file:border-0 
+                  file:text-sm file:font-semibold 
+                  file:bg-gray-700 file:text-white 
+                  hover:file:bg-gray-600
+                  ${isFileUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isFileUploading}
+              />
+              {isFileUploading && (
+                <div className="mt-2 text-blue-400">
+                  Loading...
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (
@@ -302,17 +318,26 @@ function Quiz() {
               <h2 className="text-2xl font-bold text-blue-400 mb-4">
                 Upload Validation File
               </h2>
-              <input
-                type="file"
-                accept=".pdf,.txt,.doc,.docx"
-                onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
-                className="block w-full text-sm text-gray-300 
-                  file:mr-4 file:py-2 file:px-4 
-                  file:rounded-full file:border-0 
-                  file:text-sm file:font-semibold 
-                  file:bg-gray-700 file:text-white 
-                  hover:file:bg-gray-600"
-              />
+              <div>
+                <input
+                  type="file"
+                  accept=".pdf,.txt,.doc,.docx"
+                  onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
+                  className={`block w-full text-sm text-gray-300 
+                    file:mr-4 file:py-2 file:px-4 
+                    file:rounded-full file:border-0 
+                    file:text-sm file:font-semibold 
+                    file:bg-gray-700 file:text-white 
+                    hover:file:bg-gray-600
+                    ${isValidationFileUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  disabled={isValidationFileUploading}
+                />
+                {isValidationFileUploading && (
+                  <div className="mt-2 text-blue-400">
+                    Loading...
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
