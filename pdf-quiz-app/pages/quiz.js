@@ -39,6 +39,55 @@ const extractTextFromPdf = async (file) => {
   }
 };
 
+const extractTextFromTxt = async (file) => {
+  try {
+    const text = await file.text();
+    return text;
+  } catch (error) {
+    console.error('Error extracting text from TXT:', error);
+    throw new Error('Failed to extract text from TXT');
+  }
+};
+
+const extractTextFromDoc = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch('/api/extract-doc', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to extract text from DOC/DOCX');
+    }
+    
+    const data = await response.json();
+    return data.text;
+  } catch (error) {
+    console.error('Error extracting text from DOC/DOCX:', error);
+    throw new Error(error.message || 'Failed to extract text from DOC/DOCX');
+  }
+};
+
+const extractTextFromFile = async (file) => {
+  const fileType = file.name.split('.').pop().toLowerCase();
+  
+  switch (fileType) {
+    case 'pdf':
+      return extractTextFromPdf(file);
+    case 'txt':
+      return extractTextFromTxt(file);
+    case 'doc':
+    case 'docx':
+      return extractTextFromDoc(file);
+    default:
+      throw new Error('Unsupported file type');
+  }
+};
+
 function Quiz() {
   const { userProfile } = useAuth();
   const [questions, setQuestions] = useState([]);
@@ -78,30 +127,44 @@ function Quiz() {
 
   const handleFileUpload = async (file) => {
     try {
-      const text = await extractTextFromPdf(file);
+      const text = await extractTextFromFile(file);
+      if (!text) {
+        throw new Error('No text could be extracted from the file');
+      }
+      
       setPdfText(text);
       
       const response = await axios.post('/api/generate-questions', {
         pdfContent: text
       });
       
+      if (!response.data.questions) {
+        throw new Error('No questions were generated');
+      }
+      
       setQuestions(response.data.questions);
       setShowQuiz(true);
     } catch (error) {
-      console.error('Error processing PDF:', error);
-      alert('Error processing PDF file');
+      console.error('Error processing file:', error);
+      alert(error.message || 'Error processing file');
     }
   };
 
   const handleValidationPdfUpload = async (file) => {
     try {
-      const text = await extractTextFromPdf(file);
+      const text = await extractTextFromFile(file);
+      if (!text) {
+        throw new Error('No text could be extracted from the file');
+      }
+      
       setValidationPdfText(text);
       setValidationPdfUploaded(true);
-      alert('Validation PDF uploaded successfully!');
+      alert('Validation file uploaded successfully!');
     } catch (error) {
-      console.error('Error processing validation PDF:', error);
-      alert('Error uploading validation PDF');
+      console.error('Error processing validation file:', error);
+      alert(error.message || 'Error uploading validation file');
+      setValidationPdfUploaded(false);
+      setValidationPdfText('');
     }
   };
 
@@ -109,7 +172,7 @@ function Quiz() {
     if (!questions[currentQuestionIndex]) return;
     
     if (!validationPdfUploaded) {
-      alert('Please upload the validation PDF first!');
+      alert('Please upload the validation file first!');
       return;
     }
 
@@ -189,12 +252,12 @@ function Quiz() {
       {!showQuiz ? (
         <div className="bg-gray-800 rounded-xl shadow-lg p-8 text-center">
           <h1 className="text-3xl font-bold text-blue-400 mb-6">
-            Upload PDF to Generate Quiz
+            Upload File to Generate Quiz
           </h1>
           <div className="space-y-4">
             <input
               type="file"
-              accept=".pdf"
+              accept=".pdf,.txt,.doc,.docx"
               onChange={(e) => handleFileUpload(e.target.files[0])}
               className="block w-full text-sm text-gray-300 
                 file:mr-4 file:py-2 file:px-4 
@@ -210,11 +273,11 @@ function Quiz() {
           {!validationPdfUploaded && (
             <div className="bg-gray-800 rounded-xl shadow-lg p-8">
               <h2 className="text-2xl font-bold text-blue-400 mb-4">
-                Upload Validation PDF
+                Upload Validation File
               </h2>
               <input
                 type="file"
-                accept=".pdf"
+                accept=".pdf,.txt,.doc,.docx"
                 onChange={(e) => handleValidationPdfUpload(e.target.files[0])}
                 className="block w-full text-sm text-gray-300 
                   file:mr-4 file:py-2 file:px-4 
