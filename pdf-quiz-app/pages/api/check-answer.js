@@ -56,18 +56,18 @@ Respond with ONLY "true" or "false".`;
         {
           role: "user",
           content: `
-Based on this PDF content:
+Based on the uploaded notes:
 ${pdfContent}
 
 Question: "${question}"
 Selected answer: "${selectedAnswer}"
 
-Explain why this answer is ${isCorrect ? 'correct' : 'incorrect'} using specific references from the PDF content.`
+Provide a brief explanation of why this answer is ${isCorrect ? 'correct' : 'incorrect'}.`
         }
       ],
       temperature: 0.3,
-      max_tokens: 120
-    });
+      max_tokens: 48
+    }); // made the responce this short, could be longer
 
     const explanation = explanationCompletion.choices[0].message.content;
 

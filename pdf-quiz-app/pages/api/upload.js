@@ -21,9 +21,10 @@ export default async function handler(req, res) {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     // Generate questions
-    const prompt = `Generate 5 multiple-choice questions based on this text:\n\n${text}`;
+    // Does this still get used???????? Yes
+    const prompt = `Generate questions:\n\n${text}`;
     const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
     });
 

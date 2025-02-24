@@ -103,6 +103,7 @@ function Quiz() {
   const [noteTitle, setNoteTitle] = useState("");
   const [noteBody, setNoteBody] = useState("");
   const [expandedNoteIndex, setExpandedNoteIndex] = useState(null);
+  const [questionCount, setQuestionCount] = useState(5);
   const router = useRouter();
 
   // Handler functions remain the same
@@ -135,7 +136,8 @@ function Quiz() {
       setPdfText(text);
       
       const response = await axios.post('/api/generate-questions', {
-        pdfContent: text
+        pdfContent: text,
+        questionCount: questionCount
       });
       
       if (!response.data.questions) {
@@ -255,6 +257,31 @@ function Quiz() {
             Upload File to Generate Quiz
           </h1>
           <div className="space-y-4">
+            <div className="mb-4">
+              <label className="block text-gray-300 mb-2">Number of Questions (1-20)</label>
+              <input
+                type="text"
+                pattern="[0-9]*"
+                value={questionCount}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setQuestionCount('');
+                  } else {
+                    const num = parseInt(value);
+                    if (!isNaN(num)) {
+                      setQuestionCount(Math.min(20, Math.max(1, num)));
+                    }
+                  }
+                }}
+                onBlur={() => {
+                  if (questionCount === '' || questionCount < 1) {
+                    setQuestionCount(1);
+                  }
+                }}
+                className="w-full p-2 bg-gray-700 text-white rounded-lg"
+              />
+            </div>
             <input
               type="file"
               accept=".pdf,.txt,.doc,.docx"
@@ -374,11 +401,11 @@ function Quiz() {
                     }
                   }}
                   className={`px-4 py-2 rounded-lg flex items-center ${
-                    currentQuestionIndex < questions.length - 1 && feedback.includes('✅')
+                    currentQuestionIndex < questions.length - 1
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                   }`}
-                  disabled={currentQuestionIndex === questions.length - 1 || !feedback.includes('✅')}
+                  disabled={currentQuestionIndex === questions.length - 1}
                 >
                   Next
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

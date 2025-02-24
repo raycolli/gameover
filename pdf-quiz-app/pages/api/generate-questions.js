@@ -25,21 +25,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { pdfContent } = req.body;
+    const { pdfContent, questionCount } = req.body;
+    const numQuestions = Math.min(20, Math.max(1, parseInt(questionCount) || 5));
 
     if (!pdfContent) {
-      return res.status(400).json({ error: 'PDF content is required' });
+      return res.status(400).json({ error: 'Content is required' });
     }
 
-    // Get a manageable chunk of the content
     const relevantContent = getRelevantContent(pdfContent);
 
-    const prompt = `Based on the following text excerpt from a PDF, generate 5 multiple choice questions. Focus on the key concepts and important information.
+    const prompt = `Based on the following text excerpt from the uploaded notes, generate ${numQuestions} multiple choice questions. Focus on the key concepts and important information.
 
 Text excerpt:
 ${relevantContent}
 
-Generate 5 questions in the following JSON format:
+Generate ${numQuestions} questions in the following JSON format:
 {
   "questions": [
     {
@@ -50,7 +50,7 @@ Generate 5 questions in the following JSON format:
 }
 
 Requirements:
-1. Generate exactly 5 questions
+1. Generate exactly ${numQuestions} questions
 2. Each question must have exactly 4 options
 3. Questions must be based only on the provided text
 4. Questions should be clear and unambiguous
