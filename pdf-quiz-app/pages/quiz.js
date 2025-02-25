@@ -4,6 +4,7 @@ import { withAuth } from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../utils/supabaseClient';
 import { useRouter } from 'next/router';
+import { PLANS } from '../config/stripe';
 
 // Import PDF.js in a way that works with Next.js
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
@@ -130,6 +131,57 @@ function Quiz() {
 
   const handleFileUpload = async (file) => {
     try {
+      // Check subscription status
+      const { data: subscription, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userProfile.id)
+        .single();
+
+      if (subscriptionError) {
+        // If no subscription exists, create a FREE subscription
+        const { error: insertError } = await supabase
+          .from('subscriptions')
+          .insert({
+            user_id: userProfile.id,
+            plan_type: 'FREE',
+            quiz_count: 0
+          });
+
+        if (insertError) throw insertError;
+
+        // Fetch the newly created subscription
+        const { data: newSubscription, error: fetchError } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', userProfile.id)
+          .single();
+
+        if (fetchError) throw fetchError;
+
+        subscription = newSubscription;
+      }
+
+      const userPlan = subscription?.plan_type || 'FREE';
+      const planDetails = PLANS[userPlan];
+      const currentQuizCount = subscription?.quiz_count || 0;
+
+      // Check quiz limit for FREE plan
+      if (userPlan === 'FREE' && currentQuizCount >= planDetails.quizLimit) {
+        throw new Error(
+          `Free plan limit reached (${currentQuizCount}/${planDetails.quizLimit} quizzes). ` +
+          `Upgrade to Pro for unlimited quizzes!`
+        );
+      }
+
+      // Check question count limit (same for both plans)
+      if (questionCount > planDetails.questionLimit) {
+        throw new Error(
+          `Maximum ${planDetails.questionLimit} questions allowed per quiz. ` +
+          `You requested ${questionCount} questions.`
+        );
+      }
+
       setIsFileUploading(true);
       const text = await extractTextFromFile(file);
       if (!text) {
@@ -147,10 +199,23 @@ function Quiz() {
         throw new Error('No questions were generated');
       }
       
+      // Only increment quiz count for FREE plan users
+      if (userPlan === 'FREE') {
+        const { error: updateError } = await supabase
+          .from('subscriptions')
+          .update({ 
+            quiz_count: currentQuizCount + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userProfile.id);
+
+        if (updateError) throw updateError;
+      }
+      
       setQuestions(response.data.questions);
       setShowQuiz(true);
     } catch (error) {
-      console.error('Error processing file:', error);
+      console.error('Error:', error);
       alert(error.message || 'Error processing file');
     } finally {
       setIsFileUploading(false);

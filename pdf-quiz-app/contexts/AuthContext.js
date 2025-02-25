@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
+const AuthContext = createContext({});
+
+export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
-
-const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -56,7 +56,19 @@ export function AuthProvider({ children }) {
   const isAdmin = () => userProfile?.role === 'admin';
   const isUser = () => userProfile?.role === 'user';
 
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      console.error('Error signing out:', error.message);
+      throw error;
+    }
+  };
+
   const value = {
+    signOut,
     user,
     userProfile,
     supabase,
