@@ -13,16 +13,41 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
-      router.push('/dashboard');
+      if (signInError) throw signInError;
+
+      // After successful login, check subscription status
+      const { data: subscriptionData, error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .select('status')
+        .eq('user_id', supabase.auth.user().id)
+        .single();
+
+      if (subscriptionError) throw subscriptionError;
+
+      // Redirect based on subscription status
+      if (!subscriptionData || subscriptionData.status !== 'active') {
+        router.push('/pricing'); // Redirect to pricing page if no active subscription
+      } else {
+        router.push('/dashboard'); // Redirect to dashboard if subscription is active
+      }
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  // Modify the Google OAuth handler to include subscription check
+  const handleGoogleSignIn = () => {
+    supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/pricing` // Redirect to pricing page after OAuth
+      }
+    });
   };
 
   return (
@@ -85,12 +110,7 @@ export default function Login() {
 
             <button
               type="button"
-              onClick={() => supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                  redirectTo: `${window.location.origin}/dashboard`
-                }
-              })}
+              onClick={handleGoogleSignIn}
               className="w-full mt-4 flex items-center justify-center gap-2 rounded-md bg-gray-700 px-4 py-2 
               text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-600 
               hover:bg-gray-600 focus:outline-offset-0"
