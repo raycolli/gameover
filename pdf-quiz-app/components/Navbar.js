@@ -1,10 +1,33 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 
 export default function Navbar() {
   const router = useRouter();
   const { user, userProfile, supabase } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Get user's avatar URL - either from Google or use initials as fallback
+  const getAvatarUrl = () => {
+    if (user?.user_metadata?.avatar_url) {
+      return user.user_metadata.avatar_url;
+    }
+    // Fallback to initials if no avatar
+    return null;
+  };
+
+  // Get user's initials for the fallback avatar
+  const getInitials = () => {
+    if (userProfile?.full_name) {
+      return userProfile.full_name
+        .split(' ')
+        .map(name => name[0])
+        .join('')
+        .toUpperCase();
+    }
+    return user?.email?.[0].toUpperCase() || '?';
+  };
 
   const handleSignOut = async () => {
     try {
@@ -87,15 +110,69 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {user ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-300">
-                  {userProfile?.full_name || user.email}
-                </span>
-                <button
-                  onClick={handleSignOut}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Sign Out
-                </button>
+                {/* Profile dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center space-x-3 text-gray-300 hover:text-white focus:outline-none"
+                  >
+                    {/* Avatar */}
+                    {getAvatarUrl() ? (
+                      <img
+                        src={getAvatarUrl()}
+                        alt="Profile"
+                        className="h-8 w-8 rounded-full object-cover border-2 border-gray-600"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium border-2 border-gray-600">
+                        {getInitials()}
+                      </div>
+                    )}
+                    <span className="text-sm">{userProfile?.full_name || user.email}</span>
+                    <svg 
+                      className={`h-5 w-5 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {/* Enhanced Dropdown menu */}
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg py-1 bg-gray-700 ring-1 ring-black ring-opacity-5">
+                      {/* User info section */}
+                      <div className="px-4 py-3 border-b border-gray-600">
+                        <p className="text-sm text-gray-300">Signed in as</p>
+                        <p className="text-sm font-medium text-white truncate">{user.email}</p>
+                      </div>
+                      
+                      {/* Menu items */}
+                      <div className="py-1">
+                        <Link
+                          href="/profile"
+                          className="flex items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          Your Profile
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="flex w-full items-center px-4 py-2 text-sm text-gray-300 hover:bg-gray-600"
+                        >
+                          <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="flex items-center space-x-4">
