@@ -18,8 +18,9 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        fetchUserProfile();
       } else {
+        setUserProfile(null);
         setLoading(false);
       }
     });
@@ -27,7 +28,7 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        await fetchUserProfile(session.user.id);
+        await fetchUserProfile();
       } else {
         setUserProfile(null);
       }
@@ -36,18 +37,27 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserProfile = async (userId) => {
+  const fetchUserProfile = async () => {
+    if (!user) {
+      console.log('No user found, setting userProfile to null');
+      setUserProfile(null);
+      return;
+    }
+
     try {
+      console.log('Fetching user profile for:', user.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
       if (error) throw error;
+      console.log('User profile fetched:', data);
       setUserProfile(data);
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      setUserProfile(null);
     } finally {
       setLoading(false);
     }

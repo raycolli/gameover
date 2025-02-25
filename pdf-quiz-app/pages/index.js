@@ -4,13 +4,17 @@ import Link from 'next/link';
 
 export default function Home() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   const handleGetStarted = () => {
     if (user) {
-      router.push('/dashboard');
+      if (userProfile?.role === 'pro' || userProfile?.role === 'admin') {
+        router.push('/dashboard');
+      } else {
+        router.push('/pricing');
+      }
     } else {
-      router.push('/login');
+      router.push('/signup');
     }
   };
 
@@ -50,15 +54,25 @@ export default function Home() {
             Turn your study materials into bite-sized, interactive learning experiences. 
             Note Nibblers uses AI to transform dense PDFs into engaging quizzes that help you retain information better.
           </p>
-          <button
-            onClick={handleGetStarted}
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            {user ? 'Go to Dashboard' : 'Get Started Free'}
-            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
+          <div className="flex space-x-4 justify-center">
+            <button
+              onClick={handleGetStarted}
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              {user ? 'Go to Dashboard' : 'Get Started Free'}
+              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+            {!user && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-blue-400 border-2 border-blue-400 rounded-xl hover:bg-blue-400 hover:text-white transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                View Pricing
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Features Section */}

@@ -10,11 +10,12 @@ export default function Signup() {
   const [error, setError] = useState(null);
   const router = useRouter();
   const { supabase } = useAuth();
+  const selectedPlan = typeof window !== 'undefined' ? localStorage.getItem('selectedPlan') : null;
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error: signUpError, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -23,8 +24,22 @@ export default function Signup() {
           },
         },
       });
-      if (error) throw error;
-      router.push('/dashboard');
+      
+      if (signUpError) throw signUpError;
+
+      // Create profile with role set to 'free' initially
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ 
+          full_name: fullName,
+          role: 'free' // Always start as free
+        })
+        .eq('id', data.user.id);
+
+      if (profileError) throw profileError;
+
+      // Always redirect to pricing after signup
+      router.push('/pricing');
     } catch (error) {
       setError(error.message);
     }

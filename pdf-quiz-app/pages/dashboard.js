@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { withAuth } from '../components/ProtectedRoute';
@@ -5,7 +6,36 @@ import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard() {
   const router = useRouter();
-  const { userProfile, isAdmin } = useAuth();
+  const { userProfile, loading } = useAuth();
+  const { success } = router.query;
+  
+  useEffect(() => {
+    // If user is not a pro user, redirect to pricing
+    if (userProfile && userProfile.role !== 'pro' && userProfile.role !== 'admin') {
+      router.push('/pricing');
+    }
+  }, [userProfile, router]);
+
+  // Show loading state while checking subscription
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-xl">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If userProfile is null, show an error or redirect
+  if (!userProfile) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <p className="text-white">User profile not found. Please log in again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-900 min-h-screen text-white">
@@ -14,7 +44,7 @@ function Dashboard() {
           Welcome, {userProfile.full_name}
         </h1>
         
-        {isAdmin() && (
+        {userProfile.role === 'admin' && (
           <div>
             <h2 className="text-lg font-semibold text-blue-400">Admin Controls</h2>
           </div>
@@ -49,9 +79,15 @@ function Dashboard() {
             </Link>
           </div>
         </div>
+
+        {success && (
+          <div className="mb-6 p-4 bg-green-800 text-green-100 rounded-lg">
+            <p className="font-medium">🎉 Thank you for subscribing to Pro! Your account has been upgraded.</p>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default withAuth(Dashboard, ['user', 'admin']);
+export default withAuth(Dashboard);
