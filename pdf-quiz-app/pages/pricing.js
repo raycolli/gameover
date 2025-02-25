@@ -38,37 +38,23 @@ export default function Pricing() {
 
     try {
       setLoading(true);
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          planId,
-          userId: user.id,
-        }),
-      });
-
-      const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create checkout session');
+      // Get the plan details
+      const plan = PLANS[planId];
+      
+      if (!plan || !plan.stripeLink) {
+        throw new Error('Invalid plan selected');
       }
-
-      if (!data.sessionId) {
-        throw new Error('No session ID returned from the server');
+      
+      // Build the URL with prefilled email
+      let checkoutUrl = plan.stripeLink;
+      if (user.email) {
+        checkoutUrl += `?prefilled_email=${encodeURIComponent(user.email)}`;
       }
-
-      console.log('Session ID received:', data.sessionId); // Debug log
-
-      const stripe = await getStripe();
-      const result = await stripe.redirectToCheckout({
-        sessionId: data.sessionId
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
+      
+      // Open in a new window
+      window.open(checkoutUrl, '_blank');
+      
     } catch (error) {
       console.error('Subscription error:', error);
       alert(error.message || 'Failed to subscribe');

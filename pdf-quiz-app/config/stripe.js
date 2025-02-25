@@ -27,6 +27,7 @@ export const PLANS = {
     questionLimit: 20,
     price: 1999, // $19.99
     stripePriceId: 'price_1Qw7W44SgsSTJ8c9nn6Jtpj2',
+    stripeLink: 'https://buy.stripe.com/test_aEU5mEdlraa8aJieUV',
     features: [
       'Unlimited quizzes',
       'Up to 20 questions per quiz',

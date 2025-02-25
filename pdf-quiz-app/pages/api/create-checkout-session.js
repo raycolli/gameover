@@ -1,4 +1,3 @@
-import stripe from '../../lib/stripe';
 import { PLANS } from '../../config/stripe';
 import { supabase } from '../../utils/supabaseClient';
 
@@ -8,8 +7,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { planId, userId } = req.body;
-    console.log('Request received:', { planId, userId });
+    const { planId, userId, userEmail } = req.body;
+    console.log('Request received:', { planId, userId, userEmail });
 
     // Check current subscription status
     const { data: currentSubscription, error: subError } = await supabase
@@ -31,71 +30,28 @@ export default async function handler(req, res) {
     }
 
     const plan = PLANS[planId];
-    if (!plan || !plan.stripePriceId) {
+    if (!plan || !plan.stripeLink) {
       return res.status(400).json({ message: 'Invalid plan selected' });
     }
 
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (profileError || !profile) {
-      console.error('Profile fetch error:', profileError);
-      return res.status(400).json({ message: 'Profile not found' });
+    // Instead of creating a checkout session, we'll return the hosted checkout link
+    // The front-end will handle the redirect
+    let checkoutUrl = plan.stripeLink;
+    
+    // Append email parameter if provided
+    if (userEmail) {
+      checkoutUrl += `?prefilled_email=${encodeURIComponent(userEmail)}`;
     }
+    
+    // Optionally add customer metadata via URL parameters
+    checkoutUrl += `${userEmail ? '&' : '?'}client_reference_id=${userId}`;
 
-    let customerId = currentSubscription?.stripe_customer_id;
-
-    if (!customerId) {
-      console.log('Creating new Stripe customer');
-      const customer = await stripe.customers.create({
-        email: profile.email,
-        metadata: {
-          supabase_user_id: userId,
-        },
-      });
-      customerId = customer.id;
-
-      // Update subscription with customer ID
-      await supabase
-        .from('subscriptions')
-        .update({ 
-          stripe_customer_id: customerId,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId);
-    }
-
-    console.log('Creating checkout session for customer:', customerId);
-
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price: plan.stripePriceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/pricing`,
-      metadata: {
-        userId,
-        planId,
-      },
-      allow_promotion_codes: true,
-      billing_address_collection: 'required',
-    });
-
-    console.log('Session created:', session.id);
-    res.status(200).json({ sessionId: session.id });
+    console.log('Redirecting to checkout URL:', checkoutUrl);
+    res.status(200).json({ checkoutUrl });
   } catch (error) {
     console.error('Detailed error:', error);
     res.status(500).json({ 
-      message: 'Error creating checkout session',
+      message: 'Error processing checkout request',
       error: error.message,
       stack: error.stack
     });

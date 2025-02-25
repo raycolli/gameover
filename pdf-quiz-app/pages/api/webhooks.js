@@ -11,9 +11,10 @@ export const config = {
 
 async function handleCheckoutSession(session) {
   try {
+    // Retrieve the subscription details
     const subscription = await stripe.subscriptions.retrieve(session.subscription);
     const customerId = session.customer;
-    const userId = session.metadata.userId;
+    const userId = session.client_reference_id; // This comes from the checkout URL parameter we added
     const priceId = subscription.items.data[0].price.id;
 
     // Find the plan type from price ID
@@ -26,24 +27,40 @@ async function handleCheckoutSession(session) {
       return;
     }
 
-    // Update or create subscription in Supabase
-    const { error } = await supabase
-      .from('subscriptions')
-      .upsert({
-        user_id: userId,
-        stripe_customer_id: customerId,
-        stripe_subscription_id: subscription.id,
-        plan_type: planType,
-        status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000),
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'user_id'
-      });
+    // Start a transaction to update both tables
+    const updates = await Promise.all([
+      // Update or create subscription record
+      supabase
+        .from('subscriptions')
+        .upsert({
+          user_id: userId,
+          stripe_customer_id: customerId,
+          stripe_subscription_id: subscription.id,
+          plan_type: planType,
+          status: subscription.status,
+          current_period_end: new Date(subscription.current_period_end * 1000),
+          quiz_count: 0, // Initialize quiz count
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        }),
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw error;
+      // Update profile tier
+      supabase
+        .from('profiles')
+        .update({
+          tier: planType.toLowerCase(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId)
+    ]);
+
+    // Check for errors
+    const errors = updates.filter(update => update.error);
+    if (errors.length > 0) {
+      console.error('Database update errors:', errors);
+      throw new Error('Failed to update subscription status');
     }
   } catch (error) {
     console.error('Error handling checkout session:', error);
@@ -51,50 +68,41 @@ async function handleCheckoutSession(session) {
   }
 }
 
-async function handleSubscriptionUpdated(subscription) {
+async function handleSubscriptionDeleted(subscription) {
   try {
-    const priceId = subscription.items.data[0].price.id;
-    
-    // Find the plan type from price ID
-    const planType = Object.entries(PLANS).find(
-      ([_, plan]) => plan.stripePriceId === priceId
-    )?.[0];
-
-    if (!planType) {
-      console.error('Unknown price ID:', priceId);
-      return;
-    }
-
-    // Get the user_id from metadata or customer
+    // Get the user_id from the customer metadata
     const customer = await stripe.customers.retrieve(subscription.customer);
-    const userId = customer.metadata.supabase_user_id;
+    const userId = customer.metadata.client_reference_id;
 
     // Start a transaction to update both tables
-    const { error: subscriptionError } = await supabase
-      .from('subscriptions')
-      .update({
-        plan_type: planType,
-        status: subscription.status,
-        current_period_end: new Date(subscription.current_period_end * 1000),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('stripe_subscription_id', subscription.id);
+    const updates = await Promise.all([
+      // Update subscription status
+      supabase
+        .from('subscriptions')
+        .update({
+          status: 'canceled',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('stripe_subscription_id', subscription.id),
 
-    if (subscriptionError) throw subscriptionError;
+      // Update profile tier to free
+      supabase
+        .from('profiles')
+        .update({
+          tier: 'free',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', userId)
+    ]);
 
-    // Update the profile tier
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({
-        tier: planType.toLowerCase(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', userId);
-
-    if (profileError) throw profileError;
-
+    // Check for errors
+    const errors = updates.filter(update => update.error);
+    if (errors.length > 0) {
+      console.error('Database update errors:', errors);
+      throw new Error('Failed to update subscription status');
+    }
   } catch (error) {
-    console.error('Error handling subscription update:', error);
+    console.error('Error handling subscription deletion:', error);
     throw error;
   }
 }
@@ -118,8 +126,8 @@ export default async function handler(req, res) {
       case 'checkout.session.completed':
         await handleCheckoutSession(event.data.object);
         break;
-      case 'customer.subscription.updated':
-        await handleSubscriptionUpdated(event.data.object);
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object);
         break;
       default:
         console.log(`Unhandled event type ${event.type}`);
