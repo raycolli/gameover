@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/router';
 
@@ -7,8 +7,29 @@ export default function Pricing() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) {
+        router.push('/login');
+      } else {
+        setIsAuthChecking(false);
+      }
+    };
+
+    checkAuth();
+  }, [supabase.auth, router]);
 
   const handleSubscribe = async () => {
+    if (!user) {
+      setError('Please log in to subscribe');
+      router.push('/login');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
@@ -33,6 +54,15 @@ export default function Pricing() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
